@@ -15,7 +15,7 @@ type TargetExporter struct {
 	Collector   prometheus.Collector
 }
 
-func NewPushConfig(pushGatewayURL, jobName, instanceLabel string, targetExporter []TargetExporter) *PushConfig {
+func NewPushConfig(pushGatewayURL, instanceLabel string, targetExporter []TargetExporter) *PushConfig {
 	return &PushConfig{
 		PushGatewayURL: pushGatewayURL,
 		InstanceLabel:  instanceLabel,
