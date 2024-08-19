@@ -1,4 +1,4 @@
-module pusher
+module github.com/ploynomail/pusher
 
 go 1.22.1
 
