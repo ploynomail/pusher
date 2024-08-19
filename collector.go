@@ -3,18 +3,20 @@ package pusher
 import (
 	"net/http"
 
+	"github.com/prometheus/client_golang/prometheus"
 	dto "github.com/prometheus/client_model/go"
 	"github.com/prometheus/common/expfmt"
 )
 
 type exporterCollector struct {
-	client *http.Client
-	url    string
+	Client    *http.Client
+	Url       string
+	Collector prometheus.Collector
 }
 
 // fetchAndDecodeMetrics 从指定的URL获取指标并将其解码为MetricFamily切片。
 func (cc *exporterCollector) Gather() ([]*dto.MetricFamily, error) {
-	resp, err := cc.client.Get(cc.url)
+	resp, err := cc.Client.Get(cc.Url)
 	if err != nil {
 		return nil, err
 	}
@@ -35,4 +37,12 @@ func (cc *exporterCollector) Gather() ([]*dto.MetricFamily, error) {
 	}
 
 	return metricFamilies, nil
+}
+
+func (cc *exporterCollector) Describe(ch chan<- *prometheus.Desc) {
+	cc.Collector.Describe(ch)
+}
+
+func (cc *exporterCollector) Collect(ch chan<- prometheus.Metric) {
+	cc.Collector.Collect(ch)
 }

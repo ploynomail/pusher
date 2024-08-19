@@ -53,19 +53,26 @@ func (p *Pusher) ExecPush() {
 			for _, target := range p.TargetExporter {
 				p.wg.Add(1)
 				exporterCollector := &exporterCollector{
-					client: &http.Client{},
-					url:    target.ExporterURL,
+					Client:    &http.Client{},
+					Url:       target.ExporterURL,
+					Collector: target.Collector,
 				}
 				go func(target TargetExporter) {
 					defer p.wg.Done()
-					pusher := push.New(p.PushConfig.PushGatewayURL, target.JobName).
-						Grouping(pushInstanceLabel, target.JobName).
-						Gatherer(exporterCollector)
-					if p.httpClient != nil {
-						pusher = pusher.Client(p.httpClient)
-					}
-					if err := pusher.PushContext(context.Background()); err != nil {
-						fmt.Printf("Error pushing to Pushgateway: %v\n", err)
+					if target.ExporterURL != "" {
+						pusher := push.New(p.PushConfig.PushGatewayURL, target.JobName).
+							Grouping(pushInstanceLabel, target.JobName).
+							Gatherer(exporterCollector)
+						if p.httpClient != nil {
+							pusher = pusher.Client(p.httpClient)
+						}
+						if err := pusher.PushContext(context.Background()); err != nil {
+							fmt.Printf("Error pushing to Pushgateway: %v\n", err)
+						}
+					} else if target.Collector != nil {
+						pusher := push.New(p.PushConfig.PushGatewayURL, target.JobName).
+							Grouping(pushInstanceLabel, target.JobName)
+						pusher.Collector(exporterCollector.Collector)
 					}
 				}(target)
 			}

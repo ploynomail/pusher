@@ -1,5 +1,7 @@
 package pusher
 
+import "github.com/prometheus/client_golang/prometheus"
+
 type PushConfig struct {
 	PushGatewayURL string
 	InstanceLabel  string
@@ -10,6 +12,7 @@ type PushConfig struct {
 type TargetExporter struct {
 	ExporterURL string
 	JobName     string
+	Collector   prometheus.Collector
 }
 
 func NewPushConfig(pushGatewayURL, jobName, instanceLabel string, targetExporter []TargetExporter) *PushConfig {
