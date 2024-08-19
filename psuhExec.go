@@ -46,6 +46,11 @@ func NewPusher(config PushConfig, exitCh chan struct{}) *Pusher {
 	}
 }
 
+func (p *Pusher) WithHTTPClient(client *http.Client) *Pusher {
+	p.httpClient = client
+	return p
+}
+
 func (p *Pusher) ExecPush() {
 	for {
 		select {
