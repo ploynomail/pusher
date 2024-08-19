@@ -76,8 +76,14 @@ func (p *Pusher) ExecPush() {
 						}
 					} else if target.Collector != nil {
 						pusher := push.New(p.PushConfig.PushGatewayURL, target.JobName).
-							Grouping(pushInstanceLabel, target.JobName)
+							Grouping(pushInstanceLabel, p.PushConfig.InstanceLabel)
 						pusher.Collector(exporterCollector.Collector)
+						if p.httpClient != nil {
+							pusher = pusher.Client(p.httpClient)
+						}
+						if err := pusher.PushContext(context.Background()); err != nil {
+							fmt.Printf("Error pushing to Pushgateway: %v\n", err)
+						}
 					}
 				}(target)
 			}
