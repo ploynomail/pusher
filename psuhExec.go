@@ -23,7 +23,7 @@ type Pusher struct {
 	exit       chan struct{}
 }
 
-func NewPusher(config PushConfig) *Pusher {
+func NewPusher(config PushConfig, exitCh chan struct{}) *Pusher {
 	if config.Interval <= 0 {
 		config.Interval = 10
 	}
@@ -42,7 +42,7 @@ func NewPusher(config PushConfig) *Pusher {
 		wg:         &sync.WaitGroup{},
 		ticker:     time.NewTicker(time.Duration(config.Interval) * time.Second),
 		sig:        interrupt,
-		exit:       make(chan struct{}),
+		exit:       exitCh,
 	}
 }
 
