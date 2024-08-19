@@ -65,7 +65,7 @@ func (p *Pusher) ExecPush() {
 				go func(target TargetExporter) {
 					defer p.wg.Done()
 					if target.ExporterURL != "" {
-						pusher := push.New(p.PushConfig.PushGatewayURL, target.JobName).
+						pusher := push.New(p.PushConfig.PushGatewayURL, p.PushConfig.InstanceLabel).
 							Grouping(pushInstanceLabel, target.JobName).
 							Gatherer(exporterCollector)
 						if p.httpClient != nil {
