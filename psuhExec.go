@@ -2,7 +2,6 @@ package pusher
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -62,6 +61,7 @@ func (p *Pusher) ExecPush() {
 					Url:       target.ExporterURL,
 					Collector: target.Collector,
 				}
+				p.PushConfig.logger.Sugar().Debugf("Pushing metrics to %s", p.PushConfig.PushGatewayURL)
 				go func(target TargetExporter) {
 					defer p.wg.Done()
 					if target.ExporterURL != "" {
@@ -72,7 +72,7 @@ func (p *Pusher) ExecPush() {
 							pusher = pusher.Client(p.httpClient)
 						}
 						if err := pusher.PushContext(context.Background()); err != nil {
-							fmt.Printf("Error pushing to Pushgateway: %v\n", err)
+							p.PushConfig.logger.Sugar().Errorf("Error pushing to Pushgateway: %v", err)
 						}
 					} else if target.Collector != nil {
 						pusher := push.New(p.PushConfig.PushGatewayURL, target.JobName).
@@ -82,7 +82,7 @@ func (p *Pusher) ExecPush() {
 							pusher = pusher.Client(p.httpClient)
 						}
 						if err := pusher.PushContext(context.Background()); err != nil {
-							fmt.Printf("Error pushing to Pushgateway: %v\n", err)
+							p.PushConfig.logger.Sugar().Errorf("Error pushing to Pushgateway: %v", err)
 						}
 					}
 				}(target)
@@ -90,7 +90,9 @@ func (p *Pusher) ExecPush() {
 		case <-p.sig:
 			p.wg.Wait()
 			p.exit <- struct{}{}
+			p.PushConfig.logger.Sugar().Info("Exiting pusher")
 		case <-p.exit:
+			p.PushConfig.logger.Sugar().Info("Exiting pusher")
 			return
 		}
 	}
