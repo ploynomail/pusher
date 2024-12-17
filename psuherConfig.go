@@ -1,6 +1,8 @@
 package pusher
 
 import (
+	"fmt"
+
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/zap"
 )
@@ -14,7 +16,7 @@ type noopLogger struct {
 }
 
 func (l *noopLogger) Log(keyvals ...interface{}) error {
-	l.log.Sugar().Infow("", keyvals...)
+	fmt.Println(keyvals)
 	return nil
 }
 
