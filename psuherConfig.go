@@ -14,7 +14,7 @@ type noopLogger struct {
 }
 
 func (l *noopLogger) Log(keyvals ...interface{}) error {
-	l.log.Debug("message", zap.Any("keyvals", keyvals))
+	l.log.Sugar().Infow("", keyvals...)
 	return nil
 }
 
