@@ -5,27 +5,16 @@ import (
 	"go.uber.org/zap"
 )
 
-type Level int8
-
 type Logger interface {
-	Log(level Level, keyvals ...interface{}) error
+	Log(keyvals ...interface{}) error
 }
 
 type noopLogger struct {
 	log *zap.Logger
 }
 
-func (l *noopLogger) Log(level Level, keyvals ...interface{}) error {
-	switch level {
-	case 0:
-		l.log.Debug("", zap.Any("keyvals", keyvals))
-	case 1:
-		l.log.Info("", zap.Any("keyvals", keyvals))
-	case 2:
-		l.log.Warn("", zap.Any("keyvals", keyvals))
-	case 3:
-		l.log.Error("", zap.Any("keyvals", keyvals))
-	}
+func (l *noopLogger) Log(keyvals ...interface{}) error {
+	l.log.Debug("message", zap.Any("keyvals", keyvals))
 	return nil
 }
 
